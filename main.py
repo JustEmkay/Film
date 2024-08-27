@@ -23,29 +23,54 @@ def send_image(image : list[list] , lut_in : list[int],lut_out : list[int]):
                    
 def main():
     
+    image_capture = None
+    image_file = None
+    
     with st.sidebar:
         st.header("Film Ne2Po",divider='rainbow')    
 
         with st.container(border=True):
             option : str = st.radio("Select input option",
                               ['Upload Photo','Image URL','Capture Photo'])
-    st.header("Film Negative to Positive",divider='rainbow',anchor=False)
+
+        if option == 'Capture Photo':
+            image_capture = st.camera_input("Take a picture")
     
-    if option == 'Upload Photo':
-        image_file = st.file_uploader("upload image here",type=['png', 'jpg'])
-        if image_file is not None:
+        if option == 'Upload Photo':
+            image_file = st.file_uploader("upload image here",type=['png', 'jpg'])
+    
+        with st.container(border=True):
+            r_col,g_col,b_col = st.columns(3)
+            
+            in_r = r_col.number_input("in_r",step=1,value=0)
+            in_g = g_col.number_input("in_g",step=1,value=127)
+            in_b = b_col.number_input("in_b",step=1,value=255)
+
+        with st.container(border=True):
+            r_col2,g_col2,b_col2 = st.columns(3)
+            
+            out_r = r_col2.number_input("out_r",step=1,value=255)
+            out_g = g_col2.number_input("out_g",step=1,value=80)
+            out_b = b_col2.number_input("out_b",step=1,value=20)
+            
+            
+    header_col , pop_col = st.columns([3,1],vertical_alignment='bottom')       
+    header_col.header("Film Negative to Positive",divider='rainbow',anchor=False)
+    
+    with pop_col.popover("height",
+                         use_container_width=True):
+        if image_capture is not None:
+            st.image(image_capture)
+            bytes_data = image_capture.getvalue()
+            image = cv2.imdecode(np.frombuffer(bytes_data, np.uint8),
+                                cv2.IMREAD_COLOR)
+        elif image_file is not None:
             bytes_data = image_file.getvalue()
             image = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-                     
-    if option == 'Capture Photo':
-        
-        picture = st.camera_input("Take a picture")
-        if picture is not None:
-            st.image(picture)
+        else:
+            st.info("Upload/Capture Negative-image")  
+   
 
-            bytes_data = picture.getvalue()
-            image = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-        
     # if option == 'Image URL':
     #     try:
     #         image_url = st.text_input('image url',label_visibility='collapsed',
@@ -54,25 +79,10 @@ def main():
     #         st.text(type(image_url))
     #     except Exception as e:
     #         st.error(f"{e}")
-        
-    col1 , col2 = st.columns(2)
     
-    with col1.container(border=True):
-        r_col,g_col,b_col = st.columns(3)
-        
-        in_r = r_col.number_input("in_r",step=1,value=0)
-        in_g = g_col.number_input("in_g",step=1,value=127)
-        in_b = b_col.number_input("in_b",step=1,value=255)
-
-    with col2.container(border=True):
-        r_col2,g_col2,b_col2 = st.columns(3)
-        
-        out_r = r_col2.number_input("out_r",step=1,value=255)
-        out_g = g_col2.number_input("out_g",step=1,value=80)
-        out_b = b_col2.number_input("out_b",step=1,value=20)
-
     lut_in = [in_r, in_g, in_b]
     lut_out = [out_r, out_g, out_b]
+        
 
     if st.button("Confirm",use_container_width=True):
         with st.status("Uploading Negative-image for conversion...", expanded=True) as status:
@@ -80,9 +90,9 @@ def main():
             status.update(
                 label="Processing image..", state="running", expanded=False
             )
-            st.text('')
             
             image_out = send_image(image,lut_in,lut_out)
+            
             if image_out:
                 status.update(
                     label="Conversion Successful", state="running", expanded=False
