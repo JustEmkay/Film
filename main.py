@@ -19,19 +19,42 @@ def send_image(image : list[list] , lut_in : list[int],lut_out : list[int]):
     else:
         st.toast(":red-background[Error Occured!]",icon="⚠️")
         return None
-
+    
+                   
 def main():
+    
+    with st.sidebar:
+        st.header("Film Ne2Po",divider='rainbow')    
+
+        with st.container(border=True):
+            option : str = st.radio("Select input option",
+                              ['Upload Photo','Image URL','Capture Photo'])
     st.header("Film Negative to Positive",divider='rainbow',anchor=False)
     
-    picture = st.camera_input("Take a picture")
+    if option == 'Upload Photo':
+        image_file = st.file_uploader("upload image here",type=['png', 'jpg'])
+        if image_file is not None:
+            bytes_data = image_file.getvalue()
+            image = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+                     
+    if option == 'Capture Photo':
+        
+        picture = st.camera_input("Take a picture")
+        if picture is not None:
+            st.image(picture)
 
-    if picture is not None:
-        st.image(picture)
-
-        bytes_data = picture.getvalue()
-        image = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
-    
-    
+            bytes_data = picture.getvalue()
+            image = cv2.imdecode(np.frombuffer(bytes_data, np.uint8), cv2.IMREAD_COLOR)
+        
+    # if option == 'Image URL':
+    #     try:
+    #         image_url = st.text_input('image url',label_visibility='collapsed',
+    #                               placeholder="Enter/paste image url here")
+    #         if image_url : st.image(image_url,output_format='JPEG')
+    #         st.text(type(image_url))
+    #     except Exception as e:
+    #         st.error(f"{e}")
+        
     col1 , col2 = st.columns(2)
     
     with col1.container(border=True):
@@ -71,7 +94,7 @@ def main():
                 time.sleep(1)
                 image_out_restore = np.array(image_out["image_out"], dtype=np.uint8)
                 status.update(
-                    label="Conversion complete!", state="complete", expanded=False
+                    label="Conversion complete!", state="complete", expanded=True
                 )
                 cv2.imwrite('out_image.jpg', image_out_restore)
 
