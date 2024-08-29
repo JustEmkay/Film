@@ -9,6 +9,14 @@ if 'api_connection' not in st.session_state :
 
 API_URL = "http://127.0.0.1:5000/api/"
 
+# GET REQUEST
+def test_api():
+    response = requests.get(API_URL)
+    if response.status_code == 200:
+        return True
+    return False
+
+
 # POST REQUEST
 def send_image(image : list[list] , lut_in : list[int],lut_out : list[int]):
     
@@ -23,8 +31,36 @@ def send_image(image : list[list] , lut_in : list[int],lut_out : list[int]):
         return None
   
 def api_connection_check():
-    st.
-                   
+    with st.status("Establishing connection...",expanded=False) as status:
+        time.sleep(2)
+        status.update(
+            label="Accessing API...", state="running", expanded=False
+        )
+        time.sleep(2)
+        if not test_api():
+            time.sleep(2)
+            status.update(
+                label="Accessing API...", state="error", expanded=False
+            )
+            st.error("Error Connecting to API",icon="❌")
+            time.sleep(1)
+            return False
+        else:
+            status.update(
+                label="Accessing API...", state="complete", expanded=True
+            )
+            time.sleep(2)
+            st.success("Connection Successful",icon="✔")                
+            time.sleep(2)
+            status.update(
+                label="Swicthing to Home-page.....", state="running", expanded=True
+            )
+            with st.spinner('Wait for it...'):
+                time.sleep(5)
+            return True           
+            
+            
+                  
 def main():
     
     image_capture = None
@@ -132,6 +168,9 @@ def main():
 
     
 if __name__ == '__main__' :
-    api_connection_check()
-    # main()
+    if not st.session_state.api_connection:
+        st.session_state.api_connection = api_connection_check()
+        
+    if st.session_state.api_connection:
+        main()
 

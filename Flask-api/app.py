@@ -4,10 +4,10 @@ import numpy as np
 
 app = Flask(__name__)
 
-@app.route('/',methods=['GET'])
+@app.route('/api/',methods=['GET'])
 def Connection():
     print("\nConnected to API successful.")
-    return True
+    return 'APi working!',200
 
 @app.route('/api/', methods=['POST'])
 def get_og_image():
