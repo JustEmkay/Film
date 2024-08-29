@@ -5,8 +5,9 @@ import numpy as np
 app = Flask(__name__)
 
 @app.route('/',methods=['GET'])
-def Home():
-    return "flask working..."
+def Connection():
+    print("\nConnected to API successful.")
+    return True
 
 @app.route('/api/', methods=['POST'])
 def get_og_image():

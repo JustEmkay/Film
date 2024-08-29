@@ -4,6 +4,8 @@ import numpy as np
 import requests
 import time
 
+if 'api_connection' not in st.session_state : 
+    st.session_state.api_connection = False
 
 API_URL = "http://127.0.0.1:5000/api/"
 
@@ -19,7 +21,9 @@ def send_image(image : list[list] , lut_in : list[int],lut_out : list[int]):
     else:
         st.toast(":red-background[Error Occured!]",icon="⚠️")
         return None
-    
+  
+def api_connection_check():
+    st.
                    
 def main():
     
@@ -128,5 +132,6 @@ def main():
 
     
 if __name__ == '__main__' :
-    main()
+    api_connection_check()
+    # main()
 
