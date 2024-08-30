@@ -114,16 +114,7 @@ def main():
         else:
             st.info("Upload/Capture Negative-image")  
    
-
-    # if option == 'Image URL':
-    #     try:
-    #         image_url = st.text_input('image url',label_visibility='collapsed',
-    #                               placeholder="Enter/paste image url here")
-    #         if image_url : st.image(image_url,output_format='JPEG')
-    #         st.text(type(image_url))
-    #     except Exception as e:
-    #         st.error(f"{e}")
-    
+  
     lut_in = [in_r, in_g, in_b]
     lut_out = [out_r, out_g, out_b]
         
