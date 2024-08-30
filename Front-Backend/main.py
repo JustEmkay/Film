@@ -3,18 +3,22 @@ import cv2
 import numpy as np
 import requests
 import time
+import config
 
 if 'api_connection' not in st.session_state : 
     st.session_state.api_connection = False
 
-API_URL = "http://127.0.0.1:5000/api/"
+API_URL = config.api_url
 
 # GET REQUEST
 def test_api():
-    response = requests.get(API_URL)
-    if response.status_code == 200:
-        return True
-    return False
+    try:
+        response = requests.get(API_URL)
+        if response.status_code == 200:
+            return True
+    except Exception as e:
+        print(f"Error occure : Look like server is down . Try again later . ")
+        return False
 
 
 # POST REQUEST
@@ -40,9 +44,9 @@ def api_connection_check():
         if not test_api():
             time.sleep(2)
             status.update(
-                label="Accessing API...", state="error", expanded=False
+                label="Error connection to API...", state="error", expanded=True
             )
-            st.error("Error Connecting to API",icon="❌")
+            st.error("Look like api is down. Try again later.",icon="❌")
             time.sleep(1)
             return False
         else:
@@ -97,7 +101,7 @@ def main():
     header_col , pop_col = st.columns([3,1],vertical_alignment='bottom')       
     header_col.header("Film Negative to Positive",divider='rainbow',anchor=False)
     
-    with pop_col.popover("height",
+    with pop_col.popover("Preview",
                          use_container_width=True):
         if image_capture is not None:
             st.image(image_capture)
@@ -170,6 +174,7 @@ def main():
 if __name__ == '__main__' :
     if not st.session_state.api_connection:
         st.session_state.api_connection = api_connection_check()
+        if st.session_state.api_connection : st.rerun()
         
     if st.session_state.api_connection:
         main()
